@@ -1,6 +1,7 @@
 #include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/StencilMode.hpp>
 #include <SFML/Graphics/Transform.hpp>
 
 #include <GraphicsUtil.hpp>
@@ -13,6 +14,59 @@ std::ostream& operator<<(std::ostream& os, const BlendMode& blendMode)
 {
     return os << "( " << blendMode.colorSrcFactor << ", " << blendMode.colorDstFactor << ", " << blendMode.colorEquation
               << ", " << blendMode.alphaSrcFactor << ", " << blendMode.alphaDstFactor << ", " << blendMode.alphaEquation
+              << " )";
+}
+
+std::ostream& operator<<(std::ostream& os, const StencilComparison& comparison)
+{
+    switch (comparison)
+    {
+        case StencilComparison::Never:
+            return os << "Never";
+        case StencilComparison::Less:
+            return os << "Less";
+        case StencilComparison::LessEqual:
+            return os << "LessEqual";
+        case StencilComparison::Greater:
+            return os << "Greater";
+        case StencilComparison::GreaterEqual:
+            return os << "GreaterEqual";
+        case StencilComparison::Equal:
+            return os << "Equal";
+        case StencilComparison::NotEqual:
+            return os << "NotEqual";
+        case StencilComparison::Always:
+            return os << "Always";
+    }
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const StencilUpdateOperation& updateOperation)
+{
+    switch (updateOperation)
+    {
+        case StencilUpdateOperation::Keep:
+            return os << "Keep";
+        case StencilUpdateOperation::Zero:
+            return os << "Zero";
+        case StencilUpdateOperation::Replace:
+            return os << "Replace";
+        case StencilUpdateOperation::Increment:
+            return os << "Increment";
+        case StencilUpdateOperation::Decrement:
+            return os << "Decrement";
+        case StencilUpdateOperation::Invert:
+            return os << "Invert";
+    }
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const StencilMode& stencilMode)
+{
+    return os << "( " << stencilMode.stencilComparison << ", " << stencilMode.stencilUpdateOperation << ", "
+              << stencilMode.stencilReference << ", " << stencilMode.stencilMask << ", " << stencilMode.stencilOnly
               << " )";
 }
 

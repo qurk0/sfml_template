@@ -30,6 +30,7 @@
 #include <SFML/Graphics/Export.hpp>
 
 #include <SFML/Graphics/BlendMode.hpp>
+#include <SFML/Graphics/StencilMode.hpp>
 #include <SFML/Graphics/Transform.hpp>
 
 
@@ -52,6 +53,7 @@ public:
     /// to using sf::RenderStates::Default.
     /// The default set defines:
     /// \li the BlendAlpha blend mode
+    /// \li the default StencilMode (no stencil)
     /// \li the identity transform
     /// \li a null texture
     /// \li a null shader
@@ -66,6 +68,14 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     RenderStates(const BlendMode& theBlendMode);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Construct a default set of render states with a custom stencil mode
+    ///
+    /// \param theStencilMode Stencil mode to use
+    ///
+    ////////////////////////////////////////////////////////////
+    RenderStates(const StencilMode& theStencilMode);
 
     ////////////////////////////////////////////////////////////
     /// \brief Construct a default set of render states with a custom transform
@@ -94,13 +104,18 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Construct a set of render states with all its attributes
     ///
-    /// \param theBlendMode Blend mode to use
-    /// \param theTransform Transform to use
-    /// \param theTexture   Texture to use
-    /// \param theShader    Shader to use
+    /// \param theBlendMode       Blend mode to use
+    /// \param theStencilMode     Stencil mode to use
+    /// \param theTransform       Transform to use
+    /// \param theTexture         Texture to use
+    /// \param theShader          Shader to use
     ///
     ////////////////////////////////////////////////////////////
-    RenderStates(const BlendMode& theBlendMode, const Transform& theTransform, const Texture* theTexture, const Shader* theShader);
+    RenderStates(const BlendMode&   theBlendMode,
+                 const StencilMode& theStencilMode,
+                 const Transform&   theTransform,
+                 const Texture*     theTexture,
+                 const Shader*      theShader);
 
     ////////////////////////////////////////////////////////////
     // Static member data
@@ -112,6 +127,7 @@ public:
     // Member data
     ////////////////////////////////////////////////////////////
     BlendMode      blendMode{BlendAlpha}; //!< Blending mode
+    StencilMode    stencilMode;           //!< Stencil mode
     Transform      transform;             //!< Transform
     const Texture* texture{};             //!< Texture
     const Shader*  shader{};              //!< Shader

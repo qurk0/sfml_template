@@ -22,46 +22,46 @@
 //
 ////////////////////////////////////////////////////////////
 
-#pragma once
-
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-
-#include <SFML/Graphics/BlendMode.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/ConvexShape.hpp>
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Glyph.hpp>
-#include <SFML/Graphics/Image.hpp>
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Shader.hpp>
-#include <SFML/Graphics/Shape.hpp>
-#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/StencilMode.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/Transform.hpp>
-#include <SFML/Graphics/Transformable.hpp>
-#include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/VertexBuffer.hpp>
-#include <SFML/Graphics/View.hpp>
 
-#include <SFML/Window.hpp>
+
+namespace sf
+{
+////////////////////////////////////////////////////////////
+StencilMode::StencilMode() = default;
 
 
 ////////////////////////////////////////////////////////////
-/// \defgroup graphics Graphics module
-///
-/// 2D graphics module: sprites, text, shapes, ...
-///
+StencilMode::StencilMode(StencilComparison      theStencilComparison,
+                         StencilUpdateOperation theStencilUpdateOperation,
+                         int                    theStencilReference,
+                         unsigned int           theStencilMask,
+                         bool                   theStencilOnly) :
+stencilComparison(theStencilComparison),
+stencilUpdateOperation(theStencilUpdateOperation),
+stencilReference(theStencilReference),
+stencilMask(theStencilMask),
+stencilOnly(theStencilOnly)
+{
+}
+
+
 ////////////////////////////////////////////////////////////
+bool operator==(const StencilMode& left, const StencilMode& right)
+{
+    return left.stencilUpdateOperation == right.stencilUpdateOperation &&
+           left.stencilComparison == right.stencilComparison && left.stencilReference == right.stencilReference &&
+           left.stencilMask == right.stencilMask && left.stencilOnly == right.stencilOnly;
+}
+
+
+////////////////////////////////////////////////////////////
+bool operator!=(const StencilMode& left, const StencilMode& right)
+{
+    return !(left == right);
+}
+
+} // namespace sf
