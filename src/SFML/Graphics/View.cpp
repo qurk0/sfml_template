@@ -88,6 +88,13 @@ void View::setViewport(const FloatRect& viewport)
 
 
 ////////////////////////////////////////////////////////////
+void View::setScissor(const FloatRect& scissor)
+{
+    m_scissor = scissor;
+}
+
+
+////////////////////////////////////////////////////////////
 void View::reset(const FloatRect& rectangle)
 {
     m_center.x = rectangle.left + rectangle.width / 2.f;
@@ -126,6 +133,13 @@ Angle View::getRotation() const
 const FloatRect& View::getViewport() const
 {
     return m_viewport;
+}
+
+
+////////////////////////////////////////////////////////////
+const FloatRect& View::getScissor() const
+{
+    return m_scissor;
 }
 
 
