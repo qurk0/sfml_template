@@ -129,6 +129,12 @@ add_custom_target(runtests ALL
                   DEPENDS test-sfml-system test-sfml-window test-sfml-graphics test-sfml-network test-sfml-audio
 )
 
+add_custom_command(TARGET runtests
+                   COMMENT "Copy test images"
+                   POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Graphics/expected" "${CMAKE_BINARY_DIR}/test/expected"
+)
+
+
 if(SFML_ENABLE_COVERAGE AND SFML_OS_WINDOWS)
     # Try to find and use OpenCppCoverage for coverage reporting when building with MSVC
     find_program(OpenCppCoverage_BINARY "OpenCppCoverage.exe")
@@ -156,15 +162,29 @@ if(SFML_ENABLE_COVERAGE AND OpenCppCoverage_FOUND)
     string(REPLACE "/" "\\" COVERAGE_EXCLUDE "${CMAKE_CTEST_COMMAND}")
     string(REPLACE "/" "\\" COVERAGE_SRC "${PROJECT_SOURCE_DIR}/src")
     string(REPLACE "/" "\\" COVERAGE_INCLUDE "${PROJECT_SOURCE_DIR}/include")
-
-    add_custom_command(TARGET runtests
-                       COMMENT "Run tests"
-                       POST_BUILD COMMAND "${OpenCppCoverage_BINARY}" ARGS --quiet --export_type cobertura:${PROJECT_BINARY_DIR}/coverage.out --cover_children --excluded_modules "${COVERAGE_EXCLUDE}" --sources "${COVERAGE_SRC}" --sources "${COVERAGE_INCLUDE}" -- "${CMAKE_CTEST_COMMAND}" --output-on-failure -C $<CONFIG>
-                       VERBATIM)
+    
+    if(SFML_OS_LINUX OR SFML_OS_FREEBSD OR SFML_OS_OPENBSD OR SFML_OS_NETBSD)
+        add_custom_command(TARGET runtests
+                           COMMENT "Run tests"
+                           POST_BUILD COMMAND xvfb-run ARGS -a "${OpenCppCoverage_BINARY}" --quiet --export_type cobertura:"${CMAKE_BINARY_DIR}/coverage.out" --cover_children --excluded_modules "${COVERAGE_EXCLUDE}" --sources "${COVERAGE_SRC}" --sources "${COVERAGE_INCLUDE}" -- "${CMAKE_CTEST_COMMAND}" --output-on-failure -C $<CONFIG>
+                           VERBATIM)
+    else()
+        add_custom_command(TARGET runtests
+                    COMMENT "Run tests"
+                    POST_BUILD COMMAND "${OpenCppCoverage_BINARY}" ARGS --quiet --export_type cobertura:${PROJECT_BINARY_DIR}/coverage.out --cover_children --excluded_modules "${COVERAGE_EXCLUDE}" --sources "${COVERAGE_SRC}" --sources "${COVERAGE_INCLUDE}" -- "${CMAKE_CTEST_COMMAND}" --output-on-failure -C $<CONFIG>
+                    VERBATIM)
+    endif()
 else()
     # Run tests without a coverage runner
-    add_custom_command(TARGET runtests
-                       COMMENT "Run tests"
-                       POST_BUILD COMMAND "${CMAKE_CTEST_COMMAND}" --output-on-failure -C $<CONFIG>
-                       VERBATIM)
+    if(SFML_OS_LINUX OR SFML_OS_FREEBSD OR SFML_OS_OPENBSD OR SFML_OS_NETBSD)
+        add_custom_command(TARGET runtests
+                           COMMENT "Run tests"
+                           POST_BUILD COMMAND xvfb-run ARGS -a "${CMAKE_CTEST_COMMAND}" --output-on-failure -C $<CONFIG>
+                           VERBATIM)
+    else()
+        add_custom_command(TARGET runtests
+                           COMMENT "Run tests"
+                           POST_BUILD COMMAND "${CMAKE_CTEST_COMMAND}" ARGS --output-on-failure -C $<CONFIG>
+                           VERBATIM)
+    endif()
 endif()
