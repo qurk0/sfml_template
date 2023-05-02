@@ -102,8 +102,7 @@ bool ImageLoader::loadImageFromFile(const std::filesystem::path& filename, std::
     if (ptr)
     {
         // Assign the image properties
-        size.x = static_cast<unsigned int>(width);
-        size.y = static_cast<unsigned int>(height);
+        size = Vector2u(Vector2i(width, height));
 
         if (width > 0 && height > 0)
         {
@@ -147,8 +146,7 @@ bool ImageLoader::loadImageFromMemory(const void* data, std::size_t dataSize, st
         if (ptr)
         {
             // Assign the image properties
-            size.x = static_cast<unsigned int>(width);
-            size.y = static_cast<unsigned int>(height);
+            size = Vector2u(Vector2i(width, height));
 
             if (width > 0 && height > 0)
             {
@@ -206,8 +204,7 @@ bool ImageLoader::loadImageFromStream(InputStream& stream, std::vector<std::uint
     if (ptr)
     {
         // Assign the image properties
-        size.x = static_cast<unsigned int>(width);
-        size.y = static_cast<unsigned int>(height);
+        size = Vector2u(Vector2i(width, height));
 
         if (width && height)
         {
