@@ -5,6 +5,7 @@ on: [push, pull_request, workflow_dispatch]
 env:
   DISPLAY: ":99" # Display number to use for the X server
   GALLIUM_DRIVER: llvmpipe # Use Mesa 3D software OpenGL renderer
+  HOMEBREW_NO_INSTALL_FROM_API: # No value, so brew doesn't rely on homebrew-core / homebrew-cask
 
 jobs:
   build:
@@ -92,6 +93,8 @@ jobs:
     - name: Install macOS Tools
       if: runner.os == 'macOS'
       run: |
+        brew untap homebrew/core homebrew/cask
+        brew config
         brew update
         brew install gcovr ninja || true
 
@@ -238,6 +241,8 @@ jobs:
     - name: Install macOS Dependencies
       if: runner.os == 'macOS'
       run: |
+        brew untap homebrew/core homebrew/cask
+        brew config
         brew update
         brew install llvm || true
         echo /usr/local/opt/llvm/bin >> $GITHUB_PATH
