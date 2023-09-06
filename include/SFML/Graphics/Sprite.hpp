@@ -35,6 +35,7 @@
 #include <SFML/Graphics/Vertex.hpp>
 
 #include <memory>
+#include <variant>
 
 
 namespace sf
@@ -260,9 +261,10 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    Vertex                         m_vertices[4]; //!< Vertices defining the sprite's geometry
-    std::shared_ptr<const Texture> m_texture;     //!< Texture of the sprite
-    IntRect                        m_textureRect; //!< Rectangle defining the area of the source texture to display
+    using TexturePtr = std::variant<const Texture*, std::shared_ptr<const Texture>>;
+    Vertex     m_vertices[4]; //!< Vertices defining the sprite's geometry
+    TexturePtr m_texture;     //!< Texture of the sprite
+    IntRect    m_textureRect; //!< Rectangle defining the area of the source texture to display
 };
 
 } // namespace sf

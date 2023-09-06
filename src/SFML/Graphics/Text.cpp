@@ -92,9 +92,21 @@ void addGlyphQuad(sf::VertexArray& vertices, sf::Vector2f position, const sf::Co
                                sf::Vector2f(u2, v2)));
 }
 
-// std::shared_ptr deleter which does nothing
-void noOpDeleter(const sf::Font*)
+// Extract raw pointer from the FontPtr variant
+const sf::Font* getFontPtr(std::variant<const sf::Font*, std::shared_ptr<const sf::Font>> font)
 {
+    static const struct Visitor
+    {
+        const sf::Font* operator()(const sf::Font* font) const
+        {
+            return font;
+        }
+        const sf::Font* operator()(const std::shared_ptr<const sf::Font>& font) const
+        {
+            return font.get();
+        }
+    } visitor;
+    return std::visit(visitor, font);
 }
 } // namespace
 
@@ -104,7 +116,7 @@ namespace sf
 ////////////////////////////////////////////////////////////
 Text::Text(const Font& font, String string, unsigned int characterSize) :
 m_string(std::move(string)),
-m_font(&font, noOpDeleter),
+m_font(&font),
 m_characterSize(characterSize)
 {
 }
@@ -116,7 +128,7 @@ m_string(std::move(string)),
 m_font(std::move(font)),
 m_characterSize(characterSize)
 {
-    assert(get_font_pointer(m_font) && "Font cannot be null");
+    assert(getFontPtr(m_font) && "Font cannot be null");
 }
 
 
@@ -134,9 +146,9 @@ void Text::setString(const String& string)
 ////////////////////////////////////////////////////////////
 void Text::setFont(const Font& font)
 {
-    if (m_font.get() != &font)
+    if (getFontPtr(m_font) != &font)
     {
-        m_font.reset(&font, noOpDeleter);
+        m_font               = &font;
         m_geometryNeedUpdate = true;
     }
 }
@@ -147,7 +159,7 @@ void Text::setFont(std::shared_ptr<const Font> font)
 {
     assert(font && "Font cannot be null");
 
-    if (m_font != font)
+    if (getFontPtr(m_font) != font.get())
     {
         m_font               = std::move(font);
         m_geometryNeedUpdate = true;
@@ -256,7 +268,7 @@ const String& Text::getString() const
 ////////////////////////////////////////////////////////////
 const Font& Text::getFont() const
 {
-    return *m_font;
+    return *getFontPtr(m_font);
 }
 
 
@@ -318,10 +330,10 @@ Vector2f Text::findCharacterPos(std::size_t index) const
 
     // Precompute the variables needed by the algorithm
     const bool  isBold          = m_style & Bold;
-    float       whitespaceWidth = m_font->getGlyph(U' ', m_characterSize, isBold).advance;
+    float       whitespaceWidth = getFontPtr(m_font)->getGlyph(U' ', m_characterSize, isBold).advance;
     const float letterSpacing   = (whitespaceWidth / 3.f) * (m_letterSpacingFactor - 1.f);
     whitespaceWidth += letterSpacing;
-    const float lineSpacing = m_font->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
+    const float lineSpacing = getFontPtr(m_font)->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
 
     // Compute the position
     Vector2f      position;
@@ -331,7 +343,7 @@ Vector2f Text::findCharacterPos(std::size_t index) const
         const std::uint32_t curChar = m_string[i];
 
         // Apply the kerning offset
-        position.x += m_font->getKerning(prevChar, curChar, m_characterSize, isBold);
+        position.x += getFontPtr(m_font)->getKerning(prevChar, curChar, m_characterSize, isBold);
         prevChar = curChar;
 
         // Handle special characters
@@ -350,7 +362,7 @@ Vector2f Text::findCharacterPos(std::size_t index) const
         }
 
         // For regular characters, add the advance offset of the glyph
-        position.x += m_font->getGlyph(curChar, m_characterSize, isBold).advance + letterSpacing;
+        position.x += getFontPtr(m_font)->getGlyph(curChar, m_characterSize, isBold).advance + letterSpacing;
     }
 
     // Transform the position to global coordinates
@@ -384,7 +396,7 @@ void Text::draw(RenderTarget& target, const RenderStates& states) const
     RenderStates statesCopy(states);
 
     statesCopy.transform *= getTransform();
-    statesCopy.texture = &m_font->getTexture(m_characterSize);
+    statesCopy.texture = &getFontPtr(m_font)->getTexture(m_characterSize);
 
     // Only draw the outline if there is something to draw
     if (m_outlineThickness != 0)
@@ -398,11 +410,11 @@ void Text::draw(RenderTarget& target, const RenderStates& states) const
 void Text::ensureGeometryUpdate() const
 {
     // Do nothing, if geometry has not changed and the font texture has not changed
-    if (!m_geometryNeedUpdate && m_font->getTexture(m_characterSize).m_cacheId == m_fontTextureId)
+    if (!m_geometryNeedUpdate && getFontPtr(m_font)->getTexture(m_characterSize).m_cacheId == m_fontTextureId)
         return;
 
     // Save the current fonts texture id
-    m_fontTextureId = m_font->getTexture(m_characterSize).m_cacheId;
+    m_fontTextureId = getFontPtr(m_font)->getTexture(m_characterSize).m_cacheId;
 
     // Mark geometry as updated
     m_geometryNeedUpdate = false;
@@ -421,20 +433,20 @@ void Text::ensureGeometryUpdate() const
     const bool  isUnderlined       = m_style & Underlined;
     const bool  isStrikeThrough    = m_style & StrikeThrough;
     const float italicShear        = (m_style & Italic) ? sf::degrees(12).asRadians() : 0.f;
-    const float underlineOffset    = m_font->getUnderlinePosition(m_characterSize);
-    const float underlineThickness = m_font->getUnderlineThickness(m_characterSize);
+    const float underlineOffset    = getFontPtr(m_font)->getUnderlinePosition(m_characterSize);
+    const float underlineThickness = getFontPtr(m_font)->getUnderlineThickness(m_characterSize);
 
     // Compute the location of the strike through dynamically
     // We use the center point of the lowercase 'x' glyph as the reference
     // We reuse the underline thickness as the thickness of the strike through as well
-    const FloatRect xBounds             = m_font->getGlyph(U'x', m_characterSize, isBold).bounds;
+    const FloatRect xBounds             = getFontPtr(m_font)->getGlyph(U'x', m_characterSize, isBold).bounds;
     const float     strikeThroughOffset = xBounds.top + xBounds.height / 2.f;
 
     // Precompute the variables needed by the algorithm
-    float       whitespaceWidth = m_font->getGlyph(U' ', m_characterSize, isBold).advance;
+    float       whitespaceWidth = getFontPtr(m_font)->getGlyph(U' ', m_characterSize, isBold).advance;
     const float letterSpacing   = (whitespaceWidth / 3.f) * (m_letterSpacingFactor - 1.f);
     whitespaceWidth += letterSpacing;
-    const float lineSpacing = m_font->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
+    const float lineSpacing = getFontPtr(m_font)->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
     float       x           = 0.f;
     auto        y           = static_cast<float>(m_characterSize);
 
@@ -453,7 +465,7 @@ void Text::ensureGeometryUpdate() const
             continue;
 
         // Apply the kerning offset
-        x += m_font->getKerning(prevChar, curChar, m_characterSize, isBold);
+        x += getFontPtr(m_font)->getKerning(prevChar, curChar, m_characterSize, isBold);
 
         // If we're using the underlined style and there's a new line, draw a line
         if (isUnderlined && (curChar == U'\n' && prevChar != U'\n'))
@@ -507,14 +519,14 @@ void Text::ensureGeometryUpdate() const
         // Apply the outline
         if (m_outlineThickness != 0)
         {
-            const Glyph& glyph = m_font->getGlyph(curChar, m_characterSize, isBold, m_outlineThickness);
+            const Glyph& glyph = getFontPtr(m_font)->getGlyph(curChar, m_characterSize, isBold, m_outlineThickness);
 
             // Add the outline glyph to the vertices
             addGlyphQuad(m_outlineVertices, Vector2f(x, y), m_outlineColor, glyph, italicShear);
         }
 
         // Extract the current glyph's description
-        const Glyph& glyph = m_font->getGlyph(curChar, m_characterSize, isBold);
+        const Glyph& glyph = getFontPtr(m_font)->getGlyph(curChar, m_characterSize, isBold);
 
         // Add the glyph to the vertices
         addGlyphQuad(m_vertices, Vector2f(x, y), m_fillColor, glyph, italicShear);

@@ -35,9 +35,21 @@
 
 namespace
 {
-// std::shared_ptr deleter which does nothing
-void noOpDeleter(const sf::Texture*)
+// Extract raw pointer from the FontPtr variant
+const sf::Texture* getTexturePtr(std::variant<const sf::Texture*, std::shared_ptr<const sf::Texture>> font)
 {
+    static const struct Visitor
+    {
+        const sf::Texture* operator()(const sf::Texture* font) const
+        {
+            return font;
+        }
+        const sf::Texture* operator()(const std::shared_ptr<const sf::Texture>& font) const
+        {
+            return font.get();
+        }
+    } visitor;
+    return std::visit(visitor, font);
 }
 } // namespace
 
@@ -88,7 +100,7 @@ void Sprite::setTexture(const Texture& texture, bool resetRect)
     }
 
     // Assign the new texture
-    m_texture.reset(&texture, noOpDeleter);
+    m_texture = &texture;
 }
 
 
@@ -134,7 +146,7 @@ void Sprite::setColor(const Color& color)
 ////////////////////////////////////////////////////////////
 const Texture& Sprite::getTexture() const
 {
-    return *m_texture;
+    return *getTexturePtr(m_texture);
 }
 
 
@@ -175,7 +187,7 @@ void Sprite::draw(RenderTarget& target, const RenderStates& states) const
     RenderStates statesCopy(states);
 
     statesCopy.transform *= getTransform();
-    statesCopy.texture = m_texture.get();
+    statesCopy.texture = getTexturePtr(m_texture);
     target.draw(m_vertices, 4, PrimitiveType::TriangleStrip, statesCopy);
 }
 
