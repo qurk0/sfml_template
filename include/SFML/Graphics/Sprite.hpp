@@ -34,6 +34,8 @@
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 
+#include <memory>
+
 
 namespace sf
 {
@@ -58,6 +60,16 @@ public:
     explicit Sprite(const Texture& texture);
 
     ////////////////////////////////////////////////////////////
+    /// \brief Construct the sprite from a source texture
+    ///
+    /// \param texture Source texture
+    ///
+    /// \see setTexture
+    ///
+    ////////////////////////////////////////////////////////////
+    explicit Sprite(std::shared_ptr<const Texture> texture);
+
+    ////////////////////////////////////////////////////////////
     /// \brief Disallow construction from a temporary texture
     ///
     ////////////////////////////////////////////////////////////
@@ -73,6 +85,17 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     Sprite(const Texture& texture, const IntRect& rectangle);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Construct the sprite from a sub-rectangle of a source texture
+    ///
+    /// \param texture   Source texture
+    /// \param rectangle Sub-rectangle of the texture to assign to the sprite
+    ///
+    /// \see setTexture, setTextureRect
+    ///
+    ////////////////////////////////////////////////////////////
+    Sprite(std::shared_ptr<const Texture> texture, const IntRect& rectangle);
 
     ////////////////////////////////////////////////////////////
     /// \brief Disallow construction from a temporary texture
@@ -100,6 +123,21 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     void setTexture(const Texture& texture, bool resetRect = false);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Change the source texture of the sprite
+    ///
+    /// Same as above but using a shared pointer to a texture to
+    /// which guarantees that the texture remains alive for the
+    /// entire lifetime of the sprite.
+    ///
+    /// \param texture   New texture
+    /// \param resetRect Should the texture rect be reset to the size of the new texture?
+    ///
+    /// \see getTexture, setTextureRect
+    ///
+    ////////////////////////////////////////////////////////////
+    void setTexture(std::shared_ptr<const Texture> texture, bool resetRect = false);
 
     ////////////////////////////////////////////////////////////
     /// \brief Disallow setting from a temporary texture
@@ -222,9 +260,9 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    Vertex         m_vertices[4]; //!< Vertices defining the sprite's geometry
-    const Texture* m_texture{};   //!< Texture of the sprite
-    IntRect        m_textureRect; //!< Rectangle defining the area of the source texture to display
+    Vertex                         m_vertices[4]; //!< Vertices defining the sprite's geometry
+    std::shared_ptr<const Texture> m_texture;     //!< Texture of the sprite
+    IntRect                        m_textureRect; //!< Rectangle defining the area of the source texture to display
 };
 
 } // namespace sf

@@ -20,6 +20,7 @@ TEST_CASE("[Graphics] sf::Text", runDisplayTests())
     }
 
     const sf::Font font;
+    const auto     fontPtr = std::make_shared<const sf::Font>();
 
     SECTION("Construction")
     {
@@ -59,19 +60,39 @@ TEST_CASE("[Graphics] sf::Text", runDisplayTests())
 
         SECTION("Font, string, and character size constructor")
         {
-            const sf::Text text(font, "abcdefghijklmnopqrstuvwxyz", 24);
-            CHECK(text.getString() == "abcdefghijklmnopqrstuvwxyz");
-            CHECK(&text.getFont() == &font);
-            CHECK(text.getCharacterSize() == 24);
-            CHECK(text.getLetterSpacing() == 1.f);
-            CHECK(text.getLineSpacing() == 1.f);
-            CHECK(text.getStyle() == sf::Text::Regular);
-            CHECK(text.getFillColor() == sf::Color::White);
-            CHECK(text.getOutlineColor() == sf::Color::Black);
-            CHECK(text.getOutlineThickness() == 0);
-            CHECK(text.findCharacterPos(0) == sf::Vector2f());
-            CHECK(text.getLocalBounds() == sf::FloatRect({0, 24}, {0, 0}));
-            CHECK(text.getGlobalBounds() == sf::FloatRect({0, 24}, {0, 0}));
+            SECTION("const Font&")
+            {
+                const sf::Text text(font, "abcdefghijklmnopqrstuvwxyz", 24);
+                CHECK(text.getString() == "abcdefghijklmnopqrstuvwxyz");
+                CHECK(&text.getFont() == &font);
+                CHECK(text.getCharacterSize() == 24);
+                CHECK(text.getLetterSpacing() == 1.f);
+                CHECK(text.getLineSpacing() == 1.f);
+                CHECK(text.getStyle() == sf::Text::Regular);
+                CHECK(text.getFillColor() == sf::Color::White);
+                CHECK(text.getOutlineColor() == sf::Color::Black);
+                CHECK(text.getOutlineThickness() == 0);
+                CHECK(text.findCharacterPos(0) == sf::Vector2f());
+                CHECK(text.getLocalBounds() == sf::FloatRect({0, 24}, {0, 0}));
+                CHECK(text.getGlobalBounds() == sf::FloatRect({0, 24}, {0, 0}));
+            }
+
+            SECTION("std::shared_ptr<const Font>")
+            {
+                const sf::Text text(fontPtr, "abcdefghijklmnopqrstuvwxyz", 24);
+                CHECK(text.getString() == "abcdefghijklmnopqrstuvwxyz");
+                CHECK(&text.getFont() == fontPtr.get());
+                CHECK(text.getCharacterSize() == 24);
+                CHECK(text.getLetterSpacing() == 1.f);
+                CHECK(text.getLineSpacing() == 1.f);
+                CHECK(text.getStyle() == sf::Text::Regular);
+                CHECK(text.getFillColor() == sf::Color::White);
+                CHECK(text.getOutlineColor() == sf::Color::Black);
+                CHECK(text.getOutlineThickness() == 0);
+                CHECK(text.findCharacterPos(0) == sf::Vector2f());
+                CHECK(text.getLocalBounds() == sf::FloatRect({0, 24}, {0, 0}));
+                CHECK(text.getGlobalBounds() == sf::FloatRect({0, 24}, {0, 0}));
+            }
         }
     }
 
@@ -84,10 +105,19 @@ TEST_CASE("[Graphics] sf::Text", runDisplayTests())
 
     SECTION("Set/get font")
     {
-        sf::Text       text(font);
-        const sf::Font otherFont;
-        text.setFont(otherFont);
-        CHECK(&text.getFont() == &otherFont);
+        SECTION("const Font&")
+        {
+            sf::Text text(fontPtr);
+            text.setFont(font);
+            CHECK(&text.getFont() == &font);
+        }
+
+        SECTION("std::shared_ptr<const Font>")
+        {
+            sf::Text text(font);
+            text.setFont(fontPtr);
+            CHECK(&text.getFont() == fontPtr.get());
+        }
     }
 
     SECTION("Set/get character size")

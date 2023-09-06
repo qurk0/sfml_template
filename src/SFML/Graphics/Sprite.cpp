@@ -33,12 +33,28 @@
 #include <cstdlib>
 
 
+namespace
+{
+// std::shared_ptr deleter which does nothing
+void noOpDeleter(const sf::Texture*)
+{
+}
+} // namespace
+
+
 namespace sf
 {
 ////////////////////////////////////////////////////////////
 Sprite::Sprite(const Texture& texture)
 {
     setTexture(texture, true);
+}
+
+
+////////////////////////////////////////////////////////////
+Sprite::Sprite(std::shared_ptr<const Texture> texture)
+{
+    setTexture(std::move(texture), true);
 }
 
 
@@ -53,6 +69,16 @@ Sprite::Sprite(const Texture& texture, const IntRect& rectangle)
 
 
 ////////////////////////////////////////////////////////////
+Sprite::Sprite(std::shared_ptr<const Texture> texture, const IntRect& rectangle)
+{
+    // Compute the texture area
+    setTextureRect(rectangle);
+    // Assign texture
+    setTexture(std::move(texture), false);
+}
+
+
+////////////////////////////////////////////////////////////
 void Sprite::setTexture(const Texture& texture, bool resetRect)
 {
     // Recompute the texture area if requested
@@ -62,7 +88,23 @@ void Sprite::setTexture(const Texture& texture, bool resetRect)
     }
 
     // Assign the new texture
-    m_texture = &texture;
+    m_texture.reset(&texture, noOpDeleter);
+}
+
+
+////////////////////////////////////////////////////////////
+void Sprite::setTexture(std::shared_ptr<const Texture> texture, bool resetRect)
+{
+    assert(texture && "Texture cannot be null");
+
+    // Recompute the texture area if requested
+    if (resetRect)
+    {
+        setTextureRect(IntRect({0, 0}, Vector2i(texture->getSize())));
+    }
+
+    // Assign the new texture
+    m_texture = std::move(texture);
 }
 
 
@@ -133,7 +175,7 @@ void Sprite::draw(RenderTarget& target, const RenderStates& states) const
     RenderStates statesCopy(states);
 
     statesCopy.transform *= getTransform();
-    statesCopy.texture = m_texture;
+    statesCopy.texture = m_texture.get();
     target.draw(m_vertices, 4, PrimitiveType::TriangleStrip, statesCopy);
 }
 

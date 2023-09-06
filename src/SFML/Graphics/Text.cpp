@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <utility>
 
+#include <cassert>
 #include <cmath>
 
 
@@ -90,6 +91,11 @@ void addGlyphQuad(sf::VertexArray& vertices, sf::Vector2f position, const sf::Co
                                color,
                                sf::Vector2f(u2, v2)));
 }
+
+// std::shared_ptr deleter which does nothing
+void noOpDeleter(const sf::Font*)
+{
+}
 } // namespace
 
 
@@ -98,9 +104,19 @@ namespace sf
 ////////////////////////////////////////////////////////////
 Text::Text(const Font& font, String string, unsigned int characterSize) :
 m_string(std::move(string)),
-m_font(&font),
+m_font(&font, noOpDeleter),
 m_characterSize(characterSize)
 {
+}
+
+
+////////////////////////////////////////////////////////////
+Text::Text(std::shared_ptr<const Font> font, String string, unsigned int characterSize) :
+m_string(std::move(string)),
+m_font(std::move(font)),
+m_characterSize(characterSize)
+{
+    assert(get_font_pointer(m_font) && "Font cannot be null");
 }
 
 
@@ -118,9 +134,22 @@ void Text::setString(const String& string)
 ////////////////////////////////////////////////////////////
 void Text::setFont(const Font& font)
 {
-    if (m_font != &font)
+    if (m_font.get() != &font)
     {
-        m_font               = &font;
+        m_font.reset(&font, noOpDeleter);
+        m_geometryNeedUpdate = true;
+    }
+}
+
+
+////////////////////////////////////////////////////////////
+void Text::setFont(std::shared_ptr<const Font> font)
+{
+    assert(font && "Font cannot be null");
+
+    if (m_font != font)
+    {
+        m_font               = std::move(font);
         m_geometryNeedUpdate = true;
     }
 }

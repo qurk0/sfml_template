@@ -36,6 +36,7 @@
 
 #include <SFML/System/String.hpp>
 
+#include <memory>
 #include <vector>
 
 
@@ -81,6 +82,20 @@ public:
     Text(const Font& font, String string = "", unsigned int characterSize = 30);
 
     ////////////////////////////////////////////////////////////
+    /// \brief Construct the text from a string, font and size
+    ///
+    /// Construct as above but using a shared pointer to a font
+    /// which guarantees the font remains alive for the lifetime
+    /// of the text object.
+    ///
+    /// \param string         Text assigned to the string
+    /// \param font           Font used to draw the string
+    /// \param characterSize  Base size of characters, in pixels
+    ///
+    ////////////////////////////////////////////////////////////
+    Text(std::shared_ptr<const Font> font, String string = "", unsigned int characterSize = 30);
+
+    ////////////////////////////////////////////////////////////
     /// \brief Disallow construction from a temporary font
     ///
     ////////////////////////////////////////////////////////////
@@ -123,6 +138,18 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     void setFont(const Font& font);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the text's font
+    ///
+    /// Same as above but using a shared pointer to a font
+    /// which guarantees the font remains alive for the lifetime
+    /// of the text object.
+    ///
+    /// \see getFont
+    ///
+    ////////////////////////////////////////////////////////////
+    void setFont(std::shared_ptr<const Font> font);
 
     ////////////////////////////////////////////////////////////
     /// \brief Disallow setting from a temporary font
@@ -406,16 +433,16 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    String                m_string;                                    //!< String to display
-    const Font*           m_font{};                                    //!< Font used to display the string
-    unsigned int          m_characterSize{30};                         //!< Base size of characters, in pixels
-    float                 m_letterSpacingFactor{1.f};                  //!< Spacing factor between letters
-    float                 m_lineSpacingFactor{1.f};                    //!< Spacing factor between lines
-    std::uint32_t         m_style{Regular};                            //!< Text style (see Style enum)
-    Color                 m_fillColor{Color::White};                   //!< Text fill color
-    Color                 m_outlineColor{Color::Black};                //!< Text outline color
-    float                 m_outlineThickness{0.f};                     //!< Thickness of the text's outline
-    mutable VertexArray   m_vertices{PrimitiveType::Triangles};        //!< Vertex array containing the fill geometry
+    String                      m_string;                              //!< String to display
+    std::shared_ptr<const Font> m_font;                                //!< Font used to display the string
+    unsigned int                m_characterSize{30};                   //!< Base size of characters, in pixels
+    float                       m_letterSpacingFactor{1.f};            //!< Spacing factor between letters
+    float                       m_lineSpacingFactor{1.f};              //!< Spacing factor between lines
+    std::uint32_t               m_style{Regular};                      //!< Text style (see Style enum)
+    Color                       m_fillColor{Color::White};             //!< Text fill color
+    Color                       m_outlineColor{Color::Black};          //!< Text outline color
+    float                       m_outlineThickness{0.f};               //!< Thickness of the text's outline
+    mutable VertexArray         m_vertices{PrimitiveType::Triangles};  //!< Vertex array containing the fill geometry
     mutable VertexArray   m_outlineVertices{PrimitiveType::Triangles}; //!< Vertex array containing the outline geometry
     mutable FloatRect     m_bounds;               //!< Bounding rectangle of the text (in local coordinates)
     mutable bool          m_geometryNeedUpdate{}; //!< Does the geometry need to be recomputed?

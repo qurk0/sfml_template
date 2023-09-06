@@ -20,36 +20,72 @@ TEST_CASE("[Graphics] sf::Sprite", runDisplayTests())
     }
 
     const sf::Texture texture;
+    const auto        texturePtr = std::make_shared<const sf::Texture>();
 
     SECTION("Construction")
     {
         SECTION("Texture constructor")
         {
-            const sf::Sprite sprite(texture);
-            CHECK(&sprite.getTexture() == &texture);
-            CHECK(sprite.getTextureRect() == sf::IntRect());
-            CHECK(sprite.getColor() == sf::Color::White);
-            CHECK(sprite.getLocalBounds() == sf::FloatRect());
-            CHECK(sprite.getGlobalBounds() == sf::FloatRect());
+            SECTION("const Texture&")
+            {
+                const sf::Sprite sprite(texture);
+                CHECK(&sprite.getTexture() == &texture);
+                CHECK(sprite.getTextureRect() == sf::IntRect());
+                CHECK(sprite.getColor() == sf::Color::White);
+                CHECK(sprite.getLocalBounds() == sf::FloatRect());
+                CHECK(sprite.getGlobalBounds() == sf::FloatRect());
+            }
+
+            SECTION("std::shared_ptr<const Texture>")
+            {
+                const sf::Sprite sprite(texturePtr);
+                CHECK(&sprite.getTexture() == texturePtr.get());
+                CHECK(sprite.getTextureRect() == sf::IntRect());
+                CHECK(sprite.getColor() == sf::Color::White);
+                CHECK(sprite.getLocalBounds() == sf::FloatRect());
+                CHECK(sprite.getGlobalBounds() == sf::FloatRect());
+            }
         }
 
         SECTION("Texture and rectangle constructor")
         {
-            const sf::Sprite sprite(texture, {{0, 0}, {40, 60}});
-            CHECK(&sprite.getTexture() == &texture);
-            CHECK(sprite.getTextureRect() == sf::IntRect({0, 0}, {40, 60}));
-            CHECK(sprite.getColor() == sf::Color::White);
-            CHECK(sprite.getLocalBounds() == sf::FloatRect({0, 0}, {40, 60}));
-            CHECK(sprite.getGlobalBounds() == sf::FloatRect({0, 0}, {40, 60}));
+            SECTION("const Texture&")
+            {
+                const sf::Sprite sprite(texture, {{0, 0}, {40, 60}});
+                CHECK(&sprite.getTexture() == &texture);
+                CHECK(sprite.getTextureRect() == sf::IntRect({0, 0}, {40, 60}));
+                CHECK(sprite.getColor() == sf::Color::White);
+                CHECK(sprite.getLocalBounds() == sf::FloatRect({0, 0}, {40, 60}));
+                CHECK(sprite.getGlobalBounds() == sf::FloatRect({0, 0}, {40, 60}));
+            }
+
+            SECTION("std::shared_ptr<const Texture>")
+            {
+                const sf::Sprite sprite(texturePtr, {{0, 0}, {40, 60}});
+                CHECK(&sprite.getTexture() == texturePtr.get());
+                CHECK(sprite.getTextureRect() == sf::IntRect({0, 0}, {40, 60}));
+                CHECK(sprite.getColor() == sf::Color::White);
+                CHECK(sprite.getLocalBounds() == sf::FloatRect({0, 0}, {40, 60}));
+                CHECK(sprite.getGlobalBounds() == sf::FloatRect({0, 0}, {40, 60}));
+            }
         }
     }
 
     SECTION("Set/get texture")
     {
-        sf::Sprite        sprite(texture);
-        const sf::Texture otherTexture;
-        sprite.setTexture(otherTexture);
-        CHECK(&sprite.getTexture() == &otherTexture);
+        SECTION("const Texture&")
+        {
+            sf::Sprite sprite(texturePtr);
+            sprite.setTexture(texture);
+            CHECK(&sprite.getTexture() == &texture);
+        }
+
+        SECTION("std::shared_ptr<const Texture>")
+        {
+            sf::Sprite sprite(texture);
+            sprite.setTexture(texturePtr);
+            CHECK(&sprite.getTexture() == texturePtr.get());
+        }
     }
 
     SECTION("Set/get texture rect")
