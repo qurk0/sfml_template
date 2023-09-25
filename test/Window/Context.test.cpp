@@ -28,8 +28,29 @@ TEST_CASE("[Window] sf::Context", runDisplayTests())
     SECTION("Construction")
     {
         const sf::Context context;
-
         CHECK(context.getSettings().majorVersion > 0);
+    }
+
+    SECTION("isExtensionAvailable()")
+    {
+        CHECK(sf::Context::isExtensionAvailable(""));
+        CHECK(!sf::Context::isExtensionAvailable(" "));
+    }
+
+    SECTION("getFunction()")
+    {
+        CHECK(sf::Context::getFunction("") == nullptr);
+        CHECK(sf::Context::getFunction(" ") == nullptr);
+    }
+
+    SECTION("getActiveContext()")
+    {
+        CHECK(sf::Context::getActiveContext() == nullptr);
+    }
+
+    SECTION("getActiveContextId()")
+    {
+        CHECK(sf::Context::getActiveContextId() == 0);
     }
 
     SECTION("Version String")
