@@ -138,4 +138,14 @@ TEST_CASE("[Graphics] sf::Text", runDisplayTests())
         text.setOutlineThickness(3.14f);
         CHECK(text.getOutlineThickness() == 3.14f);
     }
+
+    SECTION("findCharacterPos()")
+    {
+        const sf::Text text(font, "abcdefghijklmnopqrstuvwxyz");
+        CHECK(text.findCharacterPos(0) == sf::Vector2f());
+        CHECK(text.findCharacterPos(1) == sf::Vector2f());
+        CHECK(text.findCharacterPos(2) == sf::Vector2f());
+        CHECK(text.findCharacterPos(3) == sf::Vector2f());
+        CHECK(text.findCharacterPos(4) == sf::Vector2f());
+    }
 }
