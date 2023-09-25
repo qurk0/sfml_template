@@ -1,5 +1,8 @@
 #include <SFML/Graphics/Shape.hpp>
 
+// Other 1st party headers
+#include <SFML/Graphics/Texture.hpp>
+
 #include <catch2/catch_test_macros.hpp>
 
 #include <GraphicsUtil.hpp>
@@ -36,7 +39,7 @@ private:
     sf::Vector2f m_size;
 };
 
-TEST_CASE("[Graphics] sf::Shape")
+TEST_CASE("[Graphics] sf::Shape", runDisplayTests())
 {
     SECTION("Type traits")
     {
@@ -58,6 +61,14 @@ TEST_CASE("[Graphics] sf::Shape")
         CHECK(triangleShape.getOutlineThickness() == 0.0f);
         CHECK(triangleShape.getLocalBounds() == sf::FloatRect());
         CHECK(triangleShape.getGlobalBounds() == sf::FloatRect());
+    }
+
+    SECTION("Set/get texture")
+    {
+        const sf::Texture texture;
+        TriangleShape     triangleShape({});
+        triangleShape.setTexture(&texture);
+        CHECK(triangleShape.getTexture() == &texture);
     }
 
     SECTION("Set/get texture rect")
