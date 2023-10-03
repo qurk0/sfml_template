@@ -86,6 +86,22 @@ jobs:
         cmakeVersion: ${{ runner.os == 'Windows' && '3.24' || '3.22' }} # Set to minimum required version (3.24 on Windows and 3.22 elsewhere) as specified in CMakeLists.txt to test compatibility
         ninjaVersion: latest
 
+    # The pre-installed CCache on Windows seems to be broken (i.e. tests show that it doesn't work as intended)
+    # We get rid of the stock executable if any can be found and install a known working version
+    - name: Remove Broken Pre-Installed ccache
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        if [ -x "$(command -v ccache)" ]; then rm $(which ccache); fi
+
+    # In addition to installing a known working version of CCache, this action also takes care of saving and restoring the cache for us
+    # Additionally it outputs information at the end of each job that helps us to verify if the cache is working properly
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2.10
+      with:
+        verbose: 2
+        key: ${{ matrix.platform.name }}-${{ matrix.config.name }}-${{ matrix.type.name }}
+
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install xorg-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libgbm-dev xvfb fluxbox
