@@ -336,10 +336,9 @@ struct Sound::Impl
 
 
 ////////////////////////////////////////////////////////////
-Sound::Sound(const SoundBuffer& /* buffer */) : m_impl(std::make_unique<Impl>())
+Sound::Sound(const SoundBuffer& buffer) : m_impl(std::make_unique<Impl>())
 {
-    // m_buffer->attachSound(this);
-    // alCheck(alSourcei(m_source, AL_BUFFER, static_cast<ALint>(m_buffer->m_buffer)));
+    setBuffer(buffer);
 }
 
 
