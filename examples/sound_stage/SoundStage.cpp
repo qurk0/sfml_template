@@ -296,7 +296,7 @@ struct Sound : Object
 
         if (sound.getBuffer().getDuration() != sf::Time::Zero)
         {
-            auto duration = sound.getBuffer() ? sound.getBuffer().getDuration().asSeconds() : 0.f;
+            auto duration = sound.getBuffer().getDuration().asSeconds();
             if (auto offset = sound.getPlayingOffset().asSeconds();
                 ImGui::SliderFloat("Playing Offset", &offset, 0.f, duration))
                 sound.setPlayingOffset(sf::seconds(offset));
