@@ -523,6 +523,13 @@ void Sound::detachBuffer()
 
 
 ////////////////////////////////////////////////////////////
+void Sound::reattachBuffer()
+{
+    // TODO reimplement
+}
+
+
+////////////////////////////////////////////////////////////
 void* Sound::getSound() const
 {
     return &m_impl->m_sound;

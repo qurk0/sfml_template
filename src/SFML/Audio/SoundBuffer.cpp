@@ -93,7 +93,7 @@ SoundBuffer::~SoundBuffer()
 
     // Detach the buffer from the sounds that use it
     for (Sound* soundPtr : sounds)
-        soundPtr->resetBuffer();
+        soundPtr->detachBuffer();
 }
 
 
@@ -272,14 +272,14 @@ bool SoundBuffer::update(unsigned int channelCount, unsigned int sampleRate, con
 
     // Detach the buffer from the sounds that use it
     for (Sound* soundPtr : sounds)
-        soundPtr->resetBuffer();
+        soundPtr->detachBuffer();
 
     // Compute the duration
     m_impl->m_duration = seconds(
         static_cast<float>(m_impl->m_samples.size()) / static_cast<float>(sampleRate) / static_cast<float>(channelCount));
 
     // Now reattach the buffer to the sounds that use it
-    for (Sound* soundPtr : m_sounds)
+    for (Sound* soundPtr : sounds)
         soundPtr->reattachBuffer();
 
     return true;
