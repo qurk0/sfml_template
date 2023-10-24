@@ -317,7 +317,7 @@ bool Init(sf::Window& window, const sf::Vector2f& displaySize, bool loadDefaultF
 void SetCurrentWindow(const sf::Window& window) {
     auto found = std::find_if(s_windowContexts.begin(), s_windowContexts.end(),
                               [&](std::unique_ptr<WindowContext>& ctx) {
-                                  return ctx->window->getSystemHandle() == window.getSystemHandle();
+                                  return ctx->window->getNativeHandle() == window.getNativeHandle();
                               });
     assert(found != s_windowContexts.end() &&
            "Failed to find the window. Forgot to call ImGui::SFML::Init for the window?");
@@ -756,12 +756,12 @@ void Render() {
 }
 
 void Shutdown(const sf::Window& window) {
-    bool needReplacement = (s_currWindowCtx->window->getSystemHandle() == window.getSystemHandle());
+    bool needReplacement = (s_currWindowCtx->window->getNativeHandle() == window.getNativeHandle());
 
     // remove window's context
     auto found = std::find_if(s_windowContexts.begin(), s_windowContexts.end(),
                               [&](std::unique_ptr<WindowContext>& ctx) {
-                                  return ctx->window->getSystemHandle() == window.getSystemHandle();
+                                  return ctx->window->getNativeHandle() == window.getNativeHandle();
                               });
     assert(found != s_windowContexts.end() &&
            "Window wasn't inited properly: forgot to call ImGui::SFML::Init(window)?");
@@ -980,13 +980,7 @@ void Image(const sf::Sprite& sprite, const sf::Color& tintColor, const sf::Color
 
 void Image(const sf::Sprite& sprite, const sf::Vector2f& size, const sf::Color& tintColor,
            const sf::Color& borderColor) {
-    const sf::Texture* texturePtr = sprite.getTexture();
-    // sprite without texture cannot be drawn
-    if (!texturePtr) {
-        return;
-    }
-
-    const sf::Texture& texture = *texturePtr;
+    const sf::Texture& texture = sprite.getTexture();
     sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
     const sf::IntRect& textureRect = sprite.getTextureRect();
     ImVec2 uv0(textureRect.left / textureSize.x, textureRect.top / textureSize.y);
@@ -1045,13 +1039,7 @@ bool ImageButton(const sf::Sprite& sprite, const int framePadding, const sf::Col
 
 bool ImageButton(const sf::Sprite& sprite, const sf::Vector2f& size, const int framePadding,
                  const sf::Color& bgColor, const sf::Color& tintColor) {
-    const sf::Texture* texturePtr = sprite.getTexture();
-    // sprite without texture cannot be drawn
-    if (!texturePtr) {
-        return false;
-    }
-
-    const sf::Texture& texture = *texturePtr;
+    const sf::Texture& texture = sprite.getTexture();
     sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
     const sf::IntRect& textureRect = sprite.getTextureRect();
     ImVec2 uv0(textureRect.left / textureSize.x, textureRect.top / textureSize.y);
