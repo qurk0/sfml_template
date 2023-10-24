@@ -19,6 +19,7 @@
 #include "imgui.h"
 #include "imgui_stdlib.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <memory>
@@ -277,7 +278,7 @@ struct Sound : Object
 
     void draw(sf::RenderTarget& target) override
     {
-        if (sound.getBuffer() && sound.getBuffer()->getDuration() != sf::Time::Zero)
+        if (sound.getBuffer().getDuration() != sf::Time::Zero)
             drawMarker(target);
 
         ImGui::SetNextWindowSize({0.f, 0.f});
@@ -293,9 +294,9 @@ struct Sound : Object
                 errorMessage("Failed to load " + path);
         }
 
-        if (sound.getBuffer() && sound.getBuffer()->getDuration() != sf::Time::Zero)
+        if (sound.getBuffer().getDuration() != sf::Time::Zero)
         {
-            auto duration = sound.getBuffer() ? sound.getBuffer()->getDuration().asSeconds() : 0.f;
+            auto duration = sound.getBuffer() ? sound.getBuffer().getDuration().asSeconds() : 0.f;
             if (auto offset = sound.getPlayingOffset().asSeconds();
                 ImGui::SliderFloat("Playing Offset", &offset, 0.f, duration))
                 sound.setPlayingOffset(sf::seconds(offset));

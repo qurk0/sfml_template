@@ -32,10 +32,12 @@
 #include <SFML/System/Err.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <limits>
 #include <miniaudio.h>
 #include <ostream>
+
+#include <cassert>
+#include <cstring>
 
 
 namespace sf
@@ -241,7 +243,7 @@ struct Sound::Impl
             return MA_NO_DATA_AVAILABLE;
 
         // Determine how many frames we can read
-        *framesRead = std::min(frameCount, (buffer->getSampleCount() - impl.m_cursor) / buffer->getChannelCount());
+        *framesRead = std::min<ma_uint64>(frameCount, (buffer->getSampleCount() - impl.m_cursor) / buffer->getChannelCount());
 
         // Copy the samples to the output
         const auto sampleCount = *framesRead * buffer->getChannelCount();
@@ -343,7 +345,7 @@ Sound::Sound(const SoundBuffer& buffer) : m_impl(std::make_unique<Impl>())
 
 
 ////////////////////////////////////////////////////////////
-Sound::Sound(const Sound& copy) : m_impl(std::make_unique<Impl>())
+Sound::Sound(const Sound& copy) : SoundSource(), m_impl(std::make_unique<Impl>())
 {
     if (copy.m_impl->m_buffer)
         setBuffer(*copy.m_impl->m_buffer);
