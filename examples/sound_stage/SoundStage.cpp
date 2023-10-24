@@ -17,7 +17,7 @@
 
 #include "imgui-SFML.h"
 #include "imgui.h"
-#include "imgui_stdlib.h"
+// #include "imgui_stdlib.h"
 
 #include <algorithm>
 #include <cmath>
@@ -284,7 +284,7 @@ struct Sound : Object
         ImGui::SetNextWindowSize({0.f, 0.f});
         ImGui::Begin(("Sound " + std::to_string(index)).c_str());
 
-        ImGui::InputText("File Path", &path);
+        // ImGui::InputText("File Path", &path);
         ImGui::SameLine();
         if (ImGui::Button("Load"))
         {
@@ -336,7 +336,7 @@ struct Music : Object
         ImGui::SetNextWindowSize({0.f, 0.f});
         ImGui::Begin(("Music " + std::to_string(index)).c_str());
 
-        ImGui::InputText("File Path", &path);
+        // ImGui::InputText("File Path", &path);
         ImGui::SameLine();
         if (ImGui::Button("Load"))
         {
