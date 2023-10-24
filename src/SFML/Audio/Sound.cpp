@@ -49,7 +49,7 @@ struct Sound::Impl
         // Set this object up as a miniaudio data source
         ma_data_source_config config = ma_data_source_config_init();
 
-        static ma_data_source_vtable vtable{read, seek, getFormat, getCursor, getLength, setLooping, 0};
+        static constexpr ma_data_source_vtable vtable{read, seek, getFormat, getCursor, getLength, setLooping, 0};
 
         config.vtable = &vtable;
 
@@ -346,7 +346,8 @@ Sound::Sound(const SoundBuffer& buffer) : m_impl(std::make_unique<Impl>())
 
 
 ////////////////////////////////////////////////////////////
-Sound::Sound(const Sound& copy) : SoundSource(), m_impl(std::make_unique<Impl>())
+// NOLINTNEXTLINE(readability-redundant-member-init)
+Sound::Sound(const Sound& copy) : SoundSource(copy), m_impl(std::make_unique<Impl>())
 {
     if (copy.m_impl->m_buffer)
         setBuffer(*copy.m_impl->m_buffer);
@@ -458,14 +459,14 @@ bool Sound::getLoop() const
 Time Sound::getPlayingOffset() const
 {
     if (!m_impl->m_buffer || m_impl->m_buffer->getChannelCount() == 0 || m_impl->m_buffer->getSampleRate() == 0)
-        return Time();
+        return {};
 
     auto cursor = 0.f;
 
     if (auto result = ma_sound_get_cursor_in_seconds(&m_impl->m_sound, &cursor); result != MA_SUCCESS)
     {
         err() << "Failed to get sound cursor: " << ma_result_description(result) << std::endl;
-        return Time();
+        return {};
     }
 
     return seconds(cursor);

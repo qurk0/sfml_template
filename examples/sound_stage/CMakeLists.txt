@@ -14,6 +14,8 @@ FetchContent_Declare(ImGui-SFML
     GIT_SHALLOW ON)
 FetchContent_MakeAvailable(ImGui-SFML)
 set_target_properties(ImGui-SFML PROPERTIES EXPORT_COMPILE_COMMANDS OFF)
+get_target_property(IMGUI_SFML_INCLUDE_DIRS ImGui-SFML INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories(ImGui-SFML SYSTEM INTERFACE ${IMGUI_SFML_INCLUDE_DIRS})
 
 # all source files
 set(SRC SoundStage.cpp)

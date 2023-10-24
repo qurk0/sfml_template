@@ -223,7 +223,7 @@ Time SoundBuffer::getDuration() const
 ////////////////////////////////////////////////////////////
 SoundBuffer& SoundBuffer::operator=(const SoundBuffer& right)
 {
-    SoundBuffer temp(right);
+    const SoundBuffer& temp(right);
 
     std::swap(m_impl->m_samples, temp.m_impl->m_samples);
     std::swap(m_impl->m_channelCount, temp.m_impl->m_channelCount);
@@ -240,7 +240,7 @@ SoundBuffer& SoundBuffer::operator=(const SoundBuffer& right)
 bool SoundBuffer::initialize(InputSoundFile& file)
 {
     // Retrieve the sound parameters
-    std::uint64_t sampleCount = file.getSampleCount();
+    const std::uint64_t sampleCount = file.getSampleCount();
 
     // Read the samples from the provided file
     m_impl->m_samples.resize(static_cast<std::size_t>(sampleCount));
@@ -268,7 +268,7 @@ bool SoundBuffer::update(unsigned int channelCount, unsigned int sampleRate, con
     m_impl->m_channelMap   = channelMap;
 
     // First make a copy of the list of sounds so we can reattach later
-    Impl::SoundList sounds(m_impl->m_sounds);
+    const Impl::SoundList sounds(m_impl->m_sounds);
 
     // Detach the buffer from the sounds that use it
     for (Sound* soundPtr : sounds)

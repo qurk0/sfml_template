@@ -50,7 +50,7 @@ struct SoundStream::Impl
         // Set this object up as a miniaudio data source
         ma_data_source_config config = ma_data_source_config_init();
 
-        static ma_data_source_vtable vtable{read, seek, getFormat, getCursor, getLength, setLooping, 0};
+        static constexpr ma_data_source_vtable vtable{read, seek, getFormat, getCursor, getLength, setLooping, 0};
 
         config.vtable = &vtable;
 
@@ -488,14 +488,14 @@ void SoundStream::setPlayingOffset(Time timeOffset)
 Time SoundStream::getPlayingOffset() const
 {
     if (m_impl->m_channelCount == 0 || m_impl->m_sampleRate == 0)
-        return Time();
+        return {};
 
     auto cursor = 0.f;
 
     if (auto result = ma_sound_get_cursor_in_seconds(&m_impl->m_sound, &cursor); result != MA_SUCCESS)
     {
         err() << "Failed to get sound cursor: " << ma_result_description(result) << std::endl;
-        return Time();
+        return {};
     }
 
     return seconds(cursor);
