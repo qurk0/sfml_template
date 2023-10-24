@@ -13,6 +13,7 @@ FetchContent_Declare(ImGui-SFML
     GIT_TAG master
     GIT_SHALLOW ON)
 FetchContent_MakeAvailable(ImGui-SFML)
+set_target_properties(ImGui-SFML PROPERTIES EXPORT_COMPILE_COMMANDS OFF)
 
 # all source files
 set(SRC SoundStage.cpp)
