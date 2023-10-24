@@ -508,7 +508,8 @@ int main()
     window.setFramerateLimit(60);
     window.setView(sf::View(sf::Vector2f(0, 0), static_cast<sf::Vector2f>(window.getSize())));
 
-    ImGui::SFML::Init(window);
+    if (!ImGui::SFML::Init(window))
+        return EXIT_FAILURE;
 
     sf::Font font;
     if (!font.loadFromFile(resourcesDir() / "tuffy.ttf"))
