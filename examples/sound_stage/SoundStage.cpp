@@ -2,29 +2,33 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include "imgui-SFML.h"
+#include "imgui.h"
+
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Text.hpp>
+
 #include <SFML/Audio/Listener.hpp>
 #include <SFML/Audio/Music.hpp>
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/System/Clock.hpp>
+
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
-#include "imgui-SFML.h"
-#include "imgui.h"
+#include <SFML/System/Clock.hpp>
 // #include "imgui_stdlib.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
 #include <memory>
 #include <random>
 #include <vector>
+
+#include <cmath>
 
 namespace
 {
@@ -365,7 +369,7 @@ struct Music : Object
         ImGui::End();
     }
 
-    std::string path  = (resourcesDir() / "doodle_pop.ogg").string();
+    std::string path = (resourcesDir() / "doodle_pop.ogg").string();
     sf::Music   music;
 };
 
@@ -427,7 +431,7 @@ struct Tone : sf::SoundStream, Object
 
     bool onGetData(sf::SoundStream::Chunk& chunk) override
     {
-        const auto            period = 1.0 / frequency;
+        const auto period = 1.0 / frequency;
 
         for (auto i = 0u; i < chunkSize; ++i)
         {
@@ -442,8 +446,7 @@ struct Tone : sf::SoundStream, Object
                 }
                 case Type::Square:
                 {
-                    value = amplitude *
-                            (2 * (2 * std::floor(frequency * time) - std::floor(2 * frequency * time)) + 1);
+                    value = amplitude * (2 * (2 * std::floor(frequency * time) - std::floor(2 * frequency * time)) + 1);
                     break;
                 }
                 case Type::Triangle:
@@ -461,7 +464,7 @@ struct Tone : sf::SoundStream, Object
                 }
             }
 
-            sampleBuffer[i]  = static_cast<std::int16_t>(std::lround(value * std::numeric_limits<std::int16_t>::max()));
+            sampleBuffer[i] = static_cast<std::int16_t>(std::lround(value * std::numeric_limits<std::int16_t>::max()));
             time += timePerSample;
         }
 
@@ -493,7 +496,7 @@ struct Tone : sf::SoundStream, Object
     double                        time          = 0.f;
     double                        timePerSample = 1.f / static_cast<double>(sampleRate);
 };
-}
+} // namespace
 
 
 ////////////////////////////////////////////////////////////

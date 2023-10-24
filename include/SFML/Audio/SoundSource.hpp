@@ -30,8 +30,8 @@
 #include <SFML/Audio/Export.hpp>
 
 #include <SFML/Audio/AudioResource.hpp>
-#include <SFML/System/Angle.hpp>
 
+#include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector3.hpp>
 
 #include <memory>

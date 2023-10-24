@@ -25,9 +25,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Audio/Music.hpp>
-
 #include <SFML/Audio/InputSoundFile.hpp>
+#include <SFML/Audio/Music.hpp>
 
 #include <SFML/System/Err.hpp>
 #include <SFML/System/Time.hpp>

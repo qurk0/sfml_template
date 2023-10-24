@@ -31,10 +31,9 @@
 #include <SFML/System/Err.hpp>
 #include <SFML/System/Sleep.hpp>
 
-#include <miniaudio.h>
-
 #include <algorithm>
 #include <limits>
+#include <miniaudio.h>
 #include <ostream>
 #include <vector>
 
@@ -264,7 +263,7 @@ struct SoundStream::Impl
         {
             // Determine how many frames we can read
             *framesRead = std::min<ma_uint64>(frameCount,
-                                   (impl.m_sampleBuffer.size() - impl.m_sampleBufferCursor) / impl.m_channelCount);
+                                              (impl.m_sampleBuffer.size() - impl.m_sampleBufferCursor) / impl.m_channelCount);
 
             const auto sampleCount = *framesRead * impl.m_channelCount;
 
@@ -308,7 +307,7 @@ struct SoundStream::Impl
         impl.m_streaming = true;
         impl.m_sampleBuffer.clear();
         impl.m_sampleBufferCursor = 0;
-        impl.m_samplesProcessed = frameIndex * impl.m_channelCount;
+        impl.m_samplesProcessed   = frameIndex * impl.m_channelCount;
 
         if (impl.m_sampleRate != 0)
         {
@@ -364,10 +363,10 @@ struct SoundStream::Impl
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    ma_data_source_base       m_dataSourceBase{};     //!< The struct that makes this object a miniaudio data source (must be first member)
-    SoundStream* const        m_owner;                //!< Owning SoundStream object
-    std::vector<ma_channel>   m_soundChannelMap;      //!< The map of position in sample frame to sound channel (miniaudio channels)
-    ma_sound                  m_sound{};              //!< The sound
+    ma_data_source_base m_dataSourceBase{}; //!< The struct that makes this object a miniaudio data source (must be first member)
+    SoundStream* const      m_owner;           //!< Owning SoundStream object
+    std::vector<ma_channel> m_soundChannelMap; //!< The map of position in sample frame to sound channel (miniaudio channels)
+    ma_sound                m_sound{};         //!< The sound
     std::vector<std::int16_t> m_sampleBuffer;         //!< Our temporary sample buffer
     std::size_t               m_sampleBufferCursor{}; //!< The current read position in the temporary sample buffer
     std::uint64_t             m_samplesProcessed{};   //!< Number of samples processed since beginning of the stream

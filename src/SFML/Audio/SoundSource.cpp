@@ -259,7 +259,7 @@ SoundSource::Cone SoundSource::getCone() const
     {
         float innerAngle = 0.f;
         float outerAngle = 0.f;
-        Cone cone;
+        Cone  cone;
         ma_sound_get_cone(sound, &innerAngle, &outerAngle, &cone.outerGain);
         cone.innerAngle = sf::radians(innerAngle);
         cone.outerAngle = sf::radians(outerAngle);

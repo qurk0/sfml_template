@@ -25,10 +25,10 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Audio/Sound.hpp>
-
 #include <SFML/Audio/AudioDevice.hpp>
+#include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
+
 #include <SFML/System/Err.hpp>
 
 #include <algorithm>
@@ -243,7 +243,8 @@ struct Sound::Impl
             return MA_NO_DATA_AVAILABLE;
 
         // Determine how many frames we can read
-        *framesRead = std::min<ma_uint64>(frameCount, (buffer->getSampleCount() - impl.m_cursor) / buffer->getChannelCount());
+        *framesRead = std::min<ma_uint64>(frameCount,
+                                          (buffer->getSampleCount() - impl.m_cursor) / buffer->getChannelCount());
 
         // Copy the samples to the output
         const auto sampleCount = *framesRead * buffer->getChannelCount();
@@ -328,12 +329,12 @@ struct Sound::Impl
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    ma_data_source_base     m_dataSourceBase{}; //!< The struct that makes this object a miniaudio data source (must be first member)
-    std::vector<ma_channel> m_channelMap;       //!< The map of position in sample frame to sound channel (miniaudio channels)
-    ma_sound                m_sound{};          //!< The sound
-    std::size_t             m_cursor{};         //!< The current playing position
-    bool                    m_looping{};        //!< True if we are looping the sound
-    const SoundBuffer*      m_buffer{};         //!< Sound buffer bound to the source
+    ma_data_source_base m_dataSourceBase{}; //!< The struct that makes this object a miniaudio data source (must be first member)
+    std::vector<ma_channel> m_channelMap; //!< The map of position in sample frame to sound channel (miniaudio channels)
+    ma_sound                m_sound{};    //!< The sound
+    std::size_t             m_cursor{};   //!< The current playing position
+    bool                    m_looping{};  //!< True if we are looping the sound
+    const SoundBuffer*      m_buffer{};   //!< Sound buffer bound to the source
 };
 
 

@@ -33,9 +33,9 @@
 #include <algorithm>
 #include <ostream>
 
-#include <cstdint>
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 
 
 namespace
@@ -198,8 +198,8 @@ bool SoundFileWriterWav::open(const std::filesystem::path&     filename,
 
         // Build the remap table
         for (auto i = 0u; i < channelCount; ++i)
-            m_remapTable[i] = static_cast<std::size_t>(std::find(channelMap.begin(), channelMap.end(), targetChannelMap[i].channel) -
-                              channelMap.begin());
+            m_remapTable[i] = static_cast<std::size_t>(
+                std::find(channelMap.begin(), channelMap.end(), targetChannelMap[i].channel) - channelMap.begin());
 
         // Generate the channel mask
         for (const auto& channel : targetChannelMap)

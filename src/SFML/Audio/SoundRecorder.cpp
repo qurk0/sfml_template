@@ -30,15 +30,13 @@
 #include <SFML/System/Err.hpp>
 #include <SFML/System/Sleep.hpp>
 
-#include <miniaudio.h>
-
 #include <algorithm>
+#include <miniaudio.h>
 #include <optional>
 #include <ostream>
 
 #include <cassert>
 #include <cstring>
-
 
 
 namespace sf
