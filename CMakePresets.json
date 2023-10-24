@@ -9,8 +9,7 @@
         "CMAKE_CXX_EXTENSIONS": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "SFML_BUILD_EXAMPLES": "ON",
-        "SFML_BUILD_TEST_SUITE": "ON",
-        "SFML_WARNINGS_AS_ERRORS": "ON"
+        "SFML_BUILD_TEST_SUITE": "ON"
       }
     }
   ]
