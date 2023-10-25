@@ -35,7 +35,7 @@ namespace
 constexpr auto windowWidth  = 1600u;
 constexpr auto windowHeight = 900u;
 constexpr auto markerRadius = 40.f;
-constexpr auto pi           = 3.14159265359;
+constexpr auto pi           = 3.14159265359f;
 
 std::filesystem::path resourcesDir()
 {
@@ -50,7 +50,7 @@ void errorMessage(const std::string& message)
 {
     if (ImGui::BeginPopupModal("Error"))
     {
-        ImGui::Text(message.c_str());
+        ImGui::Text("%s", message.c_str());
         ImGui::EndPopup();
     }
 }
@@ -199,8 +199,7 @@ struct Object
     {
         ImGui::DragFloat2("Position", &position.x);
 
-        if (auto radians = rotation.asRadians();
-            ImGui::DragFloat("Rotation", &radians, 0.01f, static_cast<float>(-2 * pi), static_cast<float>(2 * pi)))
+        if (auto radians = rotation.asRadians(); ImGui::DragFloat("Rotation", &radians, 0.01f, -2 * pi, 2 * pi))
             rotation = sf::radians(radians);
     }
 
@@ -208,12 +207,10 @@ struct Object
     {
         auto cone = soundSource.getCone();
 
-        if (auto innerAngle = cone.innerAngle.asRadians();
-            ImGui::DragFloat("Cone Inner", &innerAngle, 0.01f, 0.f, static_cast<float>(2 * pi)))
+        if (auto innerAngle = cone.innerAngle.asRadians(); ImGui::DragFloat("Cone Inner", &innerAngle, 0.01f, 0.f, 2 * pi))
             cone.innerAngle = std::clamp(sf::radians(innerAngle), sf::degrees(0), cone.outerAngle);
 
-        if (auto outerAngle = cone.outerAngle.asRadians();
-            ImGui::DragFloat("Cone Outer", &outerAngle, 0.01f, 0.f, static_cast<float>(2 * pi)))
+        if (auto outerAngle = cone.outerAngle.asRadians(); ImGui::DragFloat("Cone Outer", &outerAngle, 0.01f, 0.f, 2 * pi))
             cone.outerAngle = std::clamp(sf::radians(outerAngle), cone.innerAngle, sf::degrees(360));
 
         if (auto outerGain = cone.outerGain; ImGui::DragFloat("Outer Gain", &outerGain, 0.001f, 0.f, 1.f))
@@ -377,8 +374,7 @@ struct Music : Object
 struct Tone : sf::SoundStream, Object
 {
     Tone(const sf::Font& font, const sf::Vector2f& listenerPosition) :
-    Object(font, *this, listenerPosition, sf::Color::Green, "T"),
-    sampleBuffer(chunkSize, 0)
+    Object(font, *this, listenerPosition, sf::Color::Green, "T")
     {
         initialize(1, sampleRate, {sf::SoundChannel::Mono});
 
@@ -411,7 +407,7 @@ struct Tone : sf::SoundStream, Object
                          [](void* data, int sampleIndex)
                          {
                              const auto& samples = *static_cast<std::vector<std::int16_t>*>(data);
-                             return static_cast<float>(samples[sampleIndex]);
+                             return static_cast<float>(samples[static_cast<std::size_t>(sampleIndex)]);
                          },
                          &sampleBuffer,
                          static_cast<int>(sampleBuffer.size()),
@@ -431,11 +427,11 @@ struct Tone : sf::SoundStream, Object
 
     bool onGetData(sf::SoundStream::Chunk& chunk) override
     {
-        const auto period = 1.0 / frequency;
+        const auto period = 1.f / frequency;
 
         for (auto i = 0u; i < chunkSize; ++i)
         {
-            auto value = 0.0;
+            auto value = 0.f;
 
             switch (type)
             {
@@ -459,7 +455,7 @@ struct Tone : sf::SoundStream, Object
                 }
                 case Type::Sawtooth:
                 {
-                    value = amplitude * 2 * (time / period - std::floor(0.5 + time / period));
+                    value = amplitude * 2 * (time / period - std::floor(0.5f + time / period));
                     break;
                 }
             }
@@ -489,12 +485,13 @@ struct Tone : sf::SoundStream, Object
 
     static constexpr unsigned int sampleRate = 44100;
     static constexpr std::size_t  chunkSize  = sampleRate / 100;
-    std::vector<std::int16_t>     sampleBuffer;
-    Type                          type          = Type::Triangle;
-    float                         amplitude     = 0.05f;
-    float                         frequency     = 220.f;
-    double                        time          = 0.f;
-    double                        timePerSample = 1.f / static_cast<double>(sampleRate);
+
+    std::vector<std::int16_t> sampleBuffer{chunkSize, 0};
+    Type                      type{Type::Triangle};
+    float                     amplitude{0.05f};
+    float                     frequency{220};
+    float                     time{};
+    float                     timePerSample{1.f / static_cast<float>(sampleRate)};
 };
 } // namespace
 
@@ -563,7 +560,7 @@ int main()
         }
 
         if (auto rotation = marker.getRotation().asRadians();
-            ImGui::DragFloat("Listener Rotation", &rotation, 0.01f, static_cast<float>(-2 * pi), static_cast<float>(2 * pi)))
+            ImGui::DragFloat("Listener Rotation", &rotation, 0.01f, -2 * pi, 2 * pi))
         {
             marker.setRotation(sf::radians(rotation));
             sf::Listener::setDirection({std::cos(rotation), 0, std::sin(rotation)});
@@ -572,11 +569,11 @@ int main()
         auto cone = sf::Listener::getCone();
 
         if (auto innerAngle = cone.innerAngle.asRadians();
-            ImGui::DragFloat("Listener Cone Inner", &innerAngle, 0.01f, 0.f, static_cast<float>(2 * pi)))
+            ImGui::DragFloat("Listener Cone Inner", &innerAngle, 0.01f, 0.f, 2 * pi))
             cone.innerAngle = std::clamp(sf::radians(innerAngle), sf::degrees(0), cone.outerAngle);
 
         if (auto outerAngle = cone.outerAngle.asRadians();
-            ImGui::DragFloat("Listener Cone Outer", &outerAngle, 0.01f, 0.f, static_cast<float>(2 * pi)))
+            ImGui::DragFloat("Listener Cone Outer", &outerAngle, 0.01f, 0.f, 2 * pi))
             cone.outerAngle = std::clamp(sf::radians(outerAngle), cone.innerAngle, sf::degrees(360));
 
         if (auto outerGain = cone.outerGain; ImGui::DragFloat("Outer Gain", &outerGain, 0.001f, 0.f, 1.f))
